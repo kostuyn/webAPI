@@ -1,10 +1,12 @@
 package main
 
 import (
+	"fmt"
 	"github.com/julienschmidt/httprouter"
 	"net"
 	"net/http"
 	"time"
+	"webApi/internal/config"
 	"webApi/internal/user"
 	"webApi/pkg/logging"
 )
@@ -22,7 +24,10 @@ func main() {
 
 func start(router *httprouter.Router) {
 	log := logging.GetLogger()
-	listener, err := net.Listen("tcp", ":1234")
+	cfg := config.GetConfig()
+
+	address := fmt.Sprintf("%s:%s", cfg.Listen.BindIp, cfg.Listen.Port)
+	listener, err := net.Listen("tcp", address)
 	if err != nil {
 		panic(err)
 	}
@@ -33,6 +38,6 @@ func start(router *httprouter.Router) {
 		ReadTimeout:  15 * time.Millisecond,
 	}
 
-	log.Info("server is listening port 0.0.0.0:1234")
+	log.Infof("server is listening port %s", address)
 	log.Fatal(server.Serve(listener))
 }
