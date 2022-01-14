@@ -3,6 +3,7 @@ package user
 import (
 	"net/http"
 	"webApi/internal/handlers"
+	"webApi/pkg/logging"
 
 	"github.com/julienschmidt/httprouter"
 )
@@ -13,10 +14,13 @@ const (
 )
 
 type handler struct {
+	log logging.Logger
 }
 
-func NewHandler() handlers.Handler {
-	return &handler{}
+func NewHandler(log *logging.Logger) handlers.Handler {
+	return &handler{
+		log: *log,
+	}
 }
 
 func (h *handler) Register(router *httprouter.Router) {
@@ -29,17 +33,19 @@ func (h *handler) Register(router *httprouter.Router) {
 }
 
 func (h *handler) getList(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
+	h.log.Infof("%s %s", r.Method, r.URL.Path)
 	w.WriteHeader(200)
 	w.Write([]byte("this is list of users"))
 }
 
 func (h *handler) createUser(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
-	w.WriteHeader(200)
+	w.WriteHeader(201)
 	w.Write([]byte("this is create user"))
 }
 
 func (h *handler) getUserByUUID(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
-	w.WriteHeader(201)
+	h.log.Infof("%s %s", r.Method, r.URL.Path)
+	w.WriteHeader(200)
 	w.Write([]byte("this is get user by UUID"))
 }
 
