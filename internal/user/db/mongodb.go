@@ -7,6 +7,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
+	"webApi/internal/apperror"
 	"webApi/internal/user"
 	"webApi/pkg/logging"
 )
@@ -57,7 +58,7 @@ func (d *db) FindOne(ctx context.Context, id string) (user user.User, err error)
 	result := d.collection.FindOne(ctx, filter)
 	if result.Err() != nil {
 		if errors.Is(result.Err(), mongo.ErrNoDocuments) {
-			return user, fmt.Errorf("user not found")
+			return user, apperror.ErrNotFound
 
 		}
 		return user, fmt.Errorf("failed to find user by id: %v", err)
@@ -86,7 +87,7 @@ func (d *db) Update(ctx context.Context, user user.User) error {
 	}
 
 	if result.MatchedCount == 0 {
-		return fmt.Errorf("no user update")
+		return apperror.ErrNotFound
 	}
 
 	return nil
@@ -106,7 +107,7 @@ func (d *db) Delete(ctx context.Context, id string) error {
 	}
 
 	if result.DeletedCount == 0 {
-		return fmt.Errorf("not found user for delete")
+		return apperror.ErrNotFound
 	}
 
 	return nil
